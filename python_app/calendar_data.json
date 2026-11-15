@@ -1,0 +1,106 @@
+{
+    "users": {
+        "ali": "1234"
+    },
+    "activities": [
+        {
+            "title": "Statistics Class",
+            "date": "2026-11-14",
+            "start_time": "09:00",
+            "end_time": "11:00",
+            "category": "Class"
+        },
+        {
+            "title": "Group Project Work",
+            "date": "2026-11-14",
+            "start_time": "12:00",
+            "end_time": "14:30",
+            "category": "Study"
+        },
+        {
+            "title": "Running",
+            "date": "2026-11-15",
+            "start_time": "08:00",
+            "end_time": "09:00",
+            "category": "Exercise"
+        },
+        {
+            "title": "Python Assignment",
+            "date": "2026-11-16",
+            "start_time": "18:00",
+            "end_time": "20:00",
+            "category": "Study"
+        },
+        {
+            "title": "Grocery Shopping",
+            "date": "2026-11-17",
+            "start_time": "17:00",
+            "end_time": "18:00",
+            "category": "Personal"
+        },
+        {
+            "title": "Test class",
+            "date": "2026-11-20",
+            "start_time": "08:30",
+            "end_time": "10:30",
+            "category": "Class"
+        }
+    ],
+    "meetings": [
+        {
+            "title": "MBAN Group Meeting",
+            "date": "2026-11-14",
+            "start_time": "15:00",
+            "end_time": "16:30",
+            "location": "SMU Library"
+        },
+        {
+            "title": "Project Integration Meeting",
+            "date": "2026-11-16",
+            "start_time": "14:00",
+            "end_time": "15:00",
+            "location": "Online"
+        },
+        {
+            "title": "Professor Meeting",
+            "date": "2026-11-18",
+            "start_time": "10:00",
+            "end_time": "10:30",
+            "location": "Sobey Building"
+        },
+        {
+            "title": "Team Meeting",
+            "date": "2026-11-20",
+            "start_time": "13:00",
+            "end_time": "14:00",
+            "location": "Library"
+        }
+    ],
+    "notes": [
+        {
+            "title": "Project Reminder",
+            "content": "Integrate ActivityManager with main.py.",
+            "date": "2026-11-14"
+        },
+        {
+            "title": "Assignment",
+            "content": "Finish MBAN 5502 Assignment 2.",
+            "date": "2026-11-15"
+        },
+        {
+            "title": "Presentation",
+            "content": "Prepare demo data for the calendar dashboard.",
+            "date": "2026-11-18"
+        },
+        {
+            "title": "Test Class",
+            "content": "Test our final project",
+            "date": "2026-11-20"
+        },
+        {
+            "title": "Study",
+            "content": "study python",
+            "date": "2026-11-20"
+        }
+    ]
+}
