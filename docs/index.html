@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Personal Calendar</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#6b7280;--line:#e5e7eb;--blue:#2563eb;--red:#dc2626;--nav:#101827}
+*{box-sizing:border-box} body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
+.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+aside{background:var(--nav);color:#fff;padding:24px 18px;position:sticky;top:0;height:100vh}
+.brand{font-size:20px;font-weight:700;margin-bottom:6px}.sub{font-size:12px;color:#9ca3af;margin-bottom:26px}
+nav button{display:block;width:100%;border:0;background:transparent;color:#cbd5e1;text-align:left;padding:12px;border-radius:10px;margin:5px 0;cursor:pointer}
+nav button.active,nav button:hover{background:#1f2937;color:#fff}
+main{padding:28px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+h1,h2,h3,p{margin-top:0}.muted{color:var(--muted)}
+button.primary,button.secondary,button.danger{border:0;border-radius:9px;padding:10px 14px;cursor:pointer}
+.primary{background:var(--blue);color:#fff}.secondary{background:#eef2ff;color:#1d4ed8}.danger{background:#fee2e2;color:#991b1b}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:18px;box-shadow:0 8px 25px rgba(20,30,50,.05);margin-bottom:16px}
+.stat b{font-size:30px;display:block;margin-top:8px}.page{display:none}.page.active{display:block}
+.item{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:13px;margin:9px 0;background:#fff}
+.meta{font-size:13px;color:var(--muted);margin-top:5px}.actions{display:flex;gap:7px}
+.notegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.note{background:#fffdf5;border:1px solid #f1e5b8;border-radius:12px;padding:14px}
+label{display:grid;gap:5px;font-size:13px;color:#475569;margin-bottom:10px}
+input,textarea{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;font:inherit}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;place-items:center;padding:18px}.modal.show{display:grid}
+.dialog{background:#fff;width:min(600px,100%);border-radius:15px;padding:20px}.modalhead{display:flex;justify-content:space-between;align-items:center}
+.close{border:0;background:transparent;font-size:25px;cursor:pointer}.error{color:#b91c1c;font-size:13px;min-height:18px}
+.conflict{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px;border-radius:9px;margin:7px 0}.ok{background:#ecfdf5;color:#047857;padding:10px;border-radius:9px}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.summary div{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff}
+@media(max-width:900px){.app{grid-template-columns:1fr} aside{position:static;height:auto}.grid4,.grid2,.notegrid{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.grid4,.grid2,.notegrid,.row{grid-template-columns:1fr} main{padding:16px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+<div class="brand">Personal Calendar</div><div class="sub">MBAN 5502 Group Project</div>
+<nav>
+<button class="nav active" data-page="dashboard">Dashboard</button>
+<button class="nav" data-page="activities">Activities</button>
+<button class="nav" data-page="meetings">Meetings</button>
+<button class="nav" data-page="notes">Notes</button>
+<button class="nav" data-page="summary">Summaries</button>
+<button class="nav" data-page="data">Data Tools</button>
+</nav>
+</aside>
+
+<main>
+<div class="top"><div><h1 id="title">Dashboard</h1><p class="muted">Personal schedule overview</p></div><button class="primary" onclick="openForm('activity')">+ Quick Add</button></div>
+
+<section id="dashboard" class="page active">
+<div class="grid4">
+<div class="card stat">Activities<b id="sa">0</b></div><div class="card stat">Meetings<b id="sm">0</b></div>
+<div class="card stat">Notes<b id="sn">0</b></div><div class="card stat">Scheduled Hours<b id="sh">0</b></div>
+</div>
+<div class="grid2">
+<div class="card"><h3>Upcoming Schedule</h3><div id="upcoming"></div></div>
+<div class="card"><h3>Conflict Detection</h3><div id="conflicts"></div></div>
+</div>
+<div class="card"><h3>Recent Notes</h3><div id="recentNotes" class="notegrid"></div></div>
+</section>
+
+<section id="activities" class="page">
+<div class="toolbar"><div><h2>Activities</h2><p class="muted">Add, edit and delete activities.</p></div><button class="primary" onclick="openForm('activity')">+ Add Activity</button></div>
+<div id="activityList"></div>
+</section>
+
+<section id="meetings" class="page">
+<div class="toolbar"><div><h2>Meetings</h2><p class="muted">Manage meetings and upcoming appointments.</p></div><button class="primary" onclick="openForm('meeting')">+ Add Meeting</button></div>
+<label>Show meetings from <input type="date" id="meetingFrom"></label>
+<button class="secondary" onclick="renderMeetings()">Apply Filter</button>
+<div id="meetingList" style="margin-top:12px"></div>
+</section>
+
+<section id="notes" class="page">
+<div class="toolbar"><div><h2>Notes</h2><p class="muted">Create, search, update and delete notes.</p></div><button class="primary" onclick="openForm('note')">+ Add Note</button></div>
+<label>Search notes <input id="noteSearch" placeholder="Title or keyword"></label>
+<div id="noteList" class="notegrid"></div>
+</section>
+
+<section id="summary" class="page">
+<h2>Schedule Summaries</h2>
+<div class="grid2">
+<div class="card"><h3>Daily Summary</h3><label>Date<input type="date" id="dailyDate"></label><button class="primary" onclick="dailySummary()">Calculate</button><div id="dailyResult"></div></div>
+<div class="card"><h3>Weekly Summary</h3><label>Week start<input type="date" id="weekDate"></label><button class="primary" onclick="weeklySummary()">Calculate</button><div id="weekResult"></div></div>
+</div>
+</section>
+
+<section id="data" class="page">
+<h2>Data Tools</h2>
+<div class="grid2">
+<div class="card"><h3>Export JSON</h3><p class="muted">Download the current browser data.</p><button class="primary" onclick="exportData()">Export</button></div>
+<div class="card"><h3>Import JSON</h3><p class="muted">Load a calendar_data.json file.</p><input type="file" id="importFile" accept=".json"></div>
+</div>
+<div class="card"><h3>Reset Demo Data</h3><button class="danger" onclick="resetData()">Reset</button></div>
+</section>
+</main>
+</div>
+
+<div class="modal" id="modal">
+<div class="dialog">
+<div class="modalhead"><h3 id="formTitle">Add</h3><button class="close" onclick="closeForm()">×</button></div>
+<form id="form">
+<input type="hidden" id="type"><input type="hidden" id="editId">
+<div id="activityFields">
+<label>Title<input id="aTitle"></label><label>Date<input type="date" id="aDate"></label>
+<div class="row"><label>Start<input type="time" id="aStart"></label><label>End<input type="time" id="aEnd"></label></div>
+<label>Category<input id="aCategory"></label>
+</div>
+<div id="meetingFields" style="display:none">
+<label>Title<input id="mTitle"></label><label>Date<input type="date" id="mDate"></label>
+<div class="row"><label>Start<input type="time" id="mStart"></label><label>End<input type="time" id="mEnd"></label></div>
+<label>Location<input id="mLocation"></label>
+</div>
+<div id="noteFields" style="display:none">
+<label>Title<input id="nTitle"></label><label>Date<input type="date" id="nDate"></label><label>Content<textarea id="nContent" rows="5"></textarea></label>
+</div>
+<div id="err" class="error"></div>
+<div style="text-align:right"><button type="button" class="secondary" onclick="closeForm()">Cancel</button> <button class="primary">Save</button></div>
+</form>
+</div>
+</div>
+
+<script>
+const KEY="pc_web_v1";
+const demo={users:{ali:"1234"},activities:[
+{id:"a1",title:"Statistics Class",date:"2026-11-14",start_time:"09:00",end_time:"11:00",category:"Class"},
+{id:"a2",title:"Group Project Work",date:"2026-11-14",start_time:"12:00",end_time:"14:30",category:"Study"},
+{id:"a3",title:"Running",date:"2026-11-15",start_time:"08:00",end_time:"09:00",category:"Exercise"}],
+meetings:[
+{id:"m1",title:"MBAN Group Meeting",date:"2026-11-14",start_time:"15:00",end_time:"16:30",location:"SMU Library"},
+{id:"m2",title:"Project Integration Meeting",date:"2026-11-16",start_time:"14:00",end_time:"15:00",location:"Online"}],
+notes:[
+{id:"n1",title:"Project Reminder",content:"Integrate ActivityManager with main.py.",date:"2026-11-14"},
+{id:"n2",title:"Presentation",content:"Prepare demo data for the calendar dashboard.",date:"2026-11-18"}]};
+let data=JSON.parse(localStorage.getItem(KEY)||JSON.stringify(demo));
+
+const save=()=>{localStorage.setItem(KEY,JSON.stringify(data));renderAll()};
+const id=p=>p+Date.now()+Math.random().toString(16).slice(2,6);
+const mins=t=>{let[a,b]=t.split(":").map(Number);return a*60+b};
+const hours=x=>Math.max(0,(mins(x.end_time)-mins(x.start_time))/60);
+const overlap=(a,b)=>a.date===b.date&&mins(a.start_time)<mins(b.end_time)&&mins(b.start_time)<mins(a.end_time);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>{document.querySelectorAll(".nav").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(b.dataset.page).classList.add("active");document.getElementById("title").textContent=b.textContent});
+
+function renderAll(){renderStats();renderActivities();renderMeetings();renderNotes();renderDashboard()}
+function renderStats(){sa.textContent=data.activities.length;sm.textContent=data.meetings.length;sn.textContent=data.notes.length;sh.textContent=[...data.activities,...data.meetings].reduce((s,x)=>s+hours(x),0).toFixed(1)}
+function renderActivities(){activityList.innerHTML=data.activities.sort((a,b)=>(a.date+a.start_time).localeCompare(b.date+b.start_time)).map(x=>`<div class="item"><div><b>${esc(x.title)}</b><div class="meta">${x.date} · ${x.start_time}-${x.end_time} · ${esc(x.category)}</div></div><div class="actions"><button class="secondary" onclick="editItem('activity','${x.id}')">Edit</button><button class="danger" onclick="del('activity','${x.id}')">Delete</button></div></div>`).join("")||"<p class='muted'>No activities.</p>"}
+function renderMeetings(){let from=meetingFrom.value;let arr=data.meetings.filter(x=>!from||x.date>=from).sort((a,b)=>(a.date+a.start_time).localeCompare(b.date+b.start_time));meetingList.innerHTML=arr.map(x=>`<div class="item"><div><b>${esc(x.title)}</b><div class="meta">${x.date} · ${x.start_time}-${x.end_time} · ${esc(x.location)}</div></div><div class="actions"><button class="secondary" onclick="editItem('meeting','${x.id}')">Edit</button><button class="danger" onclick="del('meeting','${x.id}')">Delete</button></div></div>`).join("")||"<p class='muted'>No meetings.</p>"}
+function noteCard(x){return `<div class="note"><b>${esc(x.title)}</b><p>${esc(x.content)}</p><div class="meta">${x.date}</div><div class="actions" style="margin-top:10px"><button class="secondary" onclick="editItem('note','${x.id}')">Edit</button><button class="danger" onclick="del('note','${x.id}')">Delete</button></div></div>`}
+function renderNotes(){let q=noteSearch.value.toLowerCase();let arr=data.notes.filter(x=>!q||x.title.toLowerCase().includes(q)||x.content.toLowerCase().includes(q));noteList.innerHTML=arr.map(noteCard).join("")||"<p class='muted'>No matching notes.</p>"}
+noteSearch.oninput=renderNotes;
+
+function renderDashboard(){let all=[...data.activities.map(x=>({...x,type:"Activity"})),...data.meetings.map(x=>({...x,type:"Meeting"}))].sort((a,b)=>(a.date+a.start_time).localeCompare(b.date+b.start_time));upcoming.innerHTML=all.slice(0,6).map(x=>`<div class="item"><div><b>${esc(x.title)}</b><div class="meta">${x.type} · ${x.date} · ${x.start_time}-${x.end_time}</div></div></div>`).join("");let cs=[];for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++)if(overlap(all[i],all[j]))cs.push([all[i],all[j]]);conflicts.innerHTML=cs.length?cs.map(c=>`<div class="conflict">${esc(c[0].title)} overlaps ${esc(c[1].title)} on ${c[0].date}</div>`).join(""):`<div class="ok">No conflicts detected.</div>`;recentNotes.innerHTML=[...data.notes].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,3).map(noteCard).join("")}
+
+function openForm(t,item=null){type.value=t;editId.value=item?.id||"";err.textContent="";activityFields.style.display=t==="activity"?"block":"none";meetingFields.style.display=t==="meeting"?"block":"none";noteFields.style.display=t==="note"?"block":"none";formTitle.textContent=(item?"Edit ":"Add ")+t;
+if(t==="activity"){aTitle.value=item?.title||"";aDate.value=item?.date||"";aStart.value=item?.start_time||"";aEnd.value=item?.end_time||"";aCategory.value=item?.category||""}
+if(t==="meeting"){mTitle.value=item?.title||"";mDate.value=item?.date||"";mStart.value=item?.start_time||"";mEnd.value=item?.end_time||"";mLocation.value=item?.location||""}
+if(t==="note"){nTitle.value=item?.title||"";nDate.value=item?.date||"";nContent.value=item?.content||""}
+modal.classList.add("show")}
+function closeForm(){modal.classList.remove("show")}
+function editItem(t,i){let list=t==="activity"?data.activities:t==="meeting"?data.meetings:data.notes;openForm(t,list.find(x=>x.id===i))}
+function del(t,i){if(!confirm("Delete this item?"))return;let k=t==="activity"?"activities":t==="meeting"?"meetings":"notes";data[k]=data[k].filter(x=>x.id!==i);save()}
+
+form.onsubmit=e=>{e.preventDefault();let t=type.value,i=editId.value,obj,k;
+if(t==="activity"){obj={id:i||id("a"),title:aTitle.value.trim(),date:aDate.value,start_time:aStart.value,end_time:aEnd.value,category:aCategory.value.trim()};k="activities"}
+if(t==="meeting"){obj={id:i||id("m"),title:mTitle.value.trim(),date:mDate.value,start_time:mStart.value,end_time:mEnd.value,location:mLocation.value.trim()};k="meetings"}
+if(t==="note"){obj={id:i||id("n"),title:nTitle.value.trim(),date:nDate.value,content:nContent.value.trim()};k="notes"}
+if(!obj.title||!obj.date||(t!=="note"&&(!obj.start_time||!obj.end_time||mins(obj.start_time)>=mins(obj.end_time)))||(t==="activity"&&!obj.category)||(t==="meeting"&&!obj.location)||(t==="note"&&!obj.content)){err.textContent="Please complete all fields correctly. Start time must be before end time.";return}
+if(i){let p=data[k].findIndex(x=>x.id===i);data[k][p]=obj}else data[k].push(obj);closeForm();save()};
+
+function calc(s,e){let a=data.activities.filter(x=>x.date>=s&&x.date<=e),m=data.meetings.filter(x=>x.date>=s&&x.date<=e),h=[...a,...m].reduce((z,x)=>z+hours(x),0);return{a:a.length,m:m.length,h}}
+function showSum(el,r,label){el.innerHTML=`<p><b>${label}</b></p><div class="summary"><div>Activities<b>${r.a}</b></div><div>Meetings<b>${r.m}</b></div><div>Hours<b>${r.h.toFixed(2)}</b></div></div>`}
+function dailySummary(){if(dailyDate.value)showSum(dailyResult,calc(dailyDate.value,dailyDate.value),dailyDate.value)}
+function weeklySummary(){if(!weekDate.value)return;let d=new Date(weekDate.value+"T00:00:00");d.setDate(d.getDate()+6);let e=d.toISOString().slice(0,10);showSum(weekResult,calc(weekDate.value,e),weekDate.value+" to "+e)}
+
+function exportData(){let b=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="calendar_data_export.json";a.click();URL.revokeObjectURL(u)}
+importFile.onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);data={users:x.users||{},activities:(x.activities||[]).map(v=>({id:v.id||id("a"),...v})),meetings:(x.meetings||[]).map(v=>({id:v.id||id("m"),...v})),notes:(x.notes||[]).map(v=>({id:v.id||id("n"),...v}))};save();alert("Imported successfully")}catch{alert("Invalid JSON")}};r.readAsText(f)}
+function resetData(){if(confirm("Reset demo data?")){data=JSON.parse(JSON.stringify(demo));save()}}
+save();
+</script>
+</body>
+</html>
