@@ -109,17 +109,19 @@ The Python terminal application is the core academic deliverable. The web dashbo
 
 This project was completed as a group project. The core Python application was divided between team members as follows:
 
-### Teammate 1
+### Satyam Verma
 - Developed the Login System
 - Implemented username and password verification
 - Implemented Caesar cipher encryption and decryption
 - Added the maximum login-attempt logic
 
-### Teammate 2
+
+### Dhruv Pankajkumar Patel
 - Developed the Activity and Meeting Management module
 - Implemented activity creation, display, update, and cancellation
 - Implemented meeting creation and upcoming-meeting search
 - Implemented schedule conflict detection
+
 
 ### Ali Jalilian
 - Developed the Data Management module
