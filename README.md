@@ -116,7 +116,7 @@ This project was completed as a group project. The core Python application was d
 - Added the maximum login-attempt logic
 
 
-### Dhruv Pankajkumar Patel
+### [Dhruv Pankajkumar Patel](https://github.com/pateldhruv1312) (`@pateldhruv1312`)
 - Developed the Activity and Meeting Management module
 - Implemented activity creation, display, update, and cancellation
 - Implemented meeting creation and upcoming-meeting search
