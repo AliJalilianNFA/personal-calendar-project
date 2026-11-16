@@ -109,7 +109,7 @@ The Python terminal application is the core academic deliverable. The web dashbo
 
 This project was completed as a group project. The core Python application was divided between team members as follows:
 
-### Satyam Verma
+### [Satyam Verma](https://github.com/satyam96tennis) (`@satyam96tennis`)
 - Developed the Login System
 - Implemented username and password verification
 - Implemented Caesar cipher encryption and decryption
